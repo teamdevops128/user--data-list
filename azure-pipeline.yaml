@@ -3,7 +3,7 @@ trigger:
 - none
 
 pool:
-  name: aks-agent-pool
+  vmImage: ubuntu-latest
 
 
 steps:
@@ -16,7 +16,7 @@ steps:
 
     #Purpose: To get the collaboratos in a csv by using , as a delimiter 
     
-    ORG_NAME="Somatus"
+    ORG_NAME="sdevops713"
     OUTPUT_FILE="userdetails.csv"
     ORG_API="https://api.github.com/orgs/$ORG_NAME/repos"
     HEADER="Authorization: token $(TOKEN)"
