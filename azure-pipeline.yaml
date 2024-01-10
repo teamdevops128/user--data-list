@@ -3,7 +3,7 @@ trigger:
 - none
 
 pool:
-  vmImage: ubuntu-latest
+  name: aks-agent-pool
 
 
 steps:
@@ -14,13 +14,14 @@ steps:
 - script: |
     #!/bin/bash
 
-    #purpose: To the repo and collaborators user count
+    #Purpose: To get the collaboratos in a csv by using , as a delimiter 
     
-    ORG_NAME="sdevops713"
-    OUTPUT_FILE="usercount.csv"
+    ORG_NAME="Somatus"
+    OUTPUT_FILE="userdetails.csv"
     ORG_API="https://api.github.com/orgs/$ORG_NAME/repos"
     HEADER="Authorization: token $(TOKEN)"
     COLLABORATORS_API="https://api.github.com/repos/$ORG_NAME/{repo}/collaborators"
+    echo "Repository Name,Collaborators" > "$OUTPUT_FILE"
     fetch_repos() {
     local page=1
     while true; do
@@ -29,22 +30,21 @@ steps:
             break
         fi
         for repo in $repos; do
-            fetch_collaborators "$repo"
+            fetch_and_save_collaborators "$repo"
         done
         ((page++))
     done
     }
-    fetch_collaborators() {
-    local repo="$1"
-    local collaborators_count=$(curl -s -H "$HEADER" "${COLLABORATORS_API/\{repo\}/$repo}" | jq 'length')
-    echo "$repo,$collaborators_count" >> "$OUTPUT_FILE"
+    fetch_and_save_collaborators() {
+        local repo="$1"
+        local collaborators=$(curl -s -H "$HEADER" "${COLLABORATORS_API/\{repo\}/$repo}" | jq -r '.[].login' | tr '\n' ';') # Combine collaborators with a semicolon
+        echo "$repo,\"$collaborators\"" >> "$OUTPUT_FILE"
     }
-    echo "Repository Name,Number of Collaborators" > "$OUTPUT_FILE"
     fetch_repos
-    echo "Data saved to $OUTPUT_FILE"
+    echo "Collaborator data saved to $OUTPUT_FILE"
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: '$(System.DefaultWorkingDirectory)/usercount.csv'
+    targetPath: '$(System.DefaultWorkingDirectory)/userdetails.csv'
     artifact: 'myArtifacts'
     publishLocation: pipeline
   displayName: 'Publish Artifacts'
