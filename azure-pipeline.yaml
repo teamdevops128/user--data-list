@@ -3,7 +3,7 @@ trigger:
 - none
 
 pool:
-  name: aks-agent-pool
+  name: ubuntu-latest
 
 
 steps:
@@ -16,7 +16,7 @@ steps:
 
     #purpose: To the repo and collaborators user count
     
-    ORG_NAME="Somatus"
+    ORG_NAME="sdevops713"
     OUTPUT_FILE="usercount.csv"
     ORG_API="https://api.github.com/orgs/$ORG_NAME/repos"
     HEADER="Authorization: token $(TOKEN)"
